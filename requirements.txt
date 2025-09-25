@@ -1,0 +1,13 @@
+﻿pandas
+numpy
+scikit-learn
+matplotlib
+plotly
+geopandas
+shapely
+pyproj
+fiona
+pyarrow
+pyspark
+dvc
+joblib
