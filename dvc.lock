@@ -1,0 +1,178 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/pipeline/preprocess.py --in 
+      data/raw/zomato_df_final_data.csv --out data/interim/preprocessed.parquet
+    deps:
+    - path: data/raw/zomato_df_final_data.csv
+      hash: md5
+      md5: 6bb696eac5889d15f134cee5ff09eb5d
+      size: 2690897
+    - path: src/pipeline/preprocess.py
+      hash: md5
+      md5: 817ba428e879ebb3952374ef2f6a534a
+      size: 1793
+    outs:
+    - path: data/interim/preprocessed.parquet
+      hash: md5
+      md5: f3d370ab9d99fc2b48813d2769262853
+      size: 260588
+  features:
+    cmd: python src/features/build_features.py --in 
+      data/interim/preprocessed.parquet --outdir data/processed --top_cuisines 
+      20 --top_categories 50 --seed 42
+    deps:
+    - path: data/interim/preprocessed.parquet
+      hash: md5
+      md5: f3d370ab9d99fc2b48813d2769262853
+      size: 260588
+    - path: src/features/build_features.py
+      hash: md5
+      md5: c4e39e64b28463f5ca6224600dc0dda6
+      size: 4749
+    outs:
+    - path: data/processed/X_test.parquet
+      hash: md5
+      md5: 795c530181262d386027c61dde9b7579
+      size: 149338
+    - path: data/processed/X_train.parquet
+      hash: md5
+      md5: dc2e85c47289c7f6542f59c2d5ad7c25
+      size: 325544
+    - path: data/processed/features_list.csv
+      hash: md5
+      md5: a5a3658736fd2184b0761bdaa06b19fc
+      size: 2925
+    - path: data/processed/yclf_test.parquet
+      hash: md5
+      md5: cae6d8c3d56662e1f47b3a6da863bc0f
+      size: 14035
+    - path: data/processed/yclf_train.parquet
+      hash: md5
+      md5: cb5ade7979e2af161c34bb823fae8ed7
+      size: 51683
+    - path: data/processed/yreg_test.parquet
+      hash: md5
+      md5: 371432d04b9595d9c4150dda52849b44
+      size: 15215
+    - path: data/processed/yreg_train.parquet
+      hash: md5
+      md5: a368d1d80ffd93e6198040b591737377
+      size: 56015
+  reg_sklearn:
+    cmd: python src/models/train_regression.py --in_dir data/processed 
+      --model_dir models/regression --report_path reports/metrics.json
+    deps:
+    - path: data/processed/X_test.parquet
+      hash: md5
+      md5: 795c530181262d386027c61dde9b7579
+      size: 149338
+    - path: data/processed/X_train.parquet
+      hash: md5
+      md5: dc2e85c47289c7f6542f59c2d5ad7c25
+      size: 325544
+    - path: data/processed/yreg_test.parquet
+      hash: md5
+      md5: 371432d04b9595d9c4150dda52849b44
+      size: 15215
+    - path: data/processed/yreg_train.parquet
+      hash: md5
+      md5: a368d1d80ffd93e6198040b591737377
+      size: 56015
+    - path: src/models/train_regression.py
+      hash: md5
+      md5: 3dbfcb3b9fb095409683240b605059fc
+      size: 3705
+    outs:
+    - path: models/regression/gd_model.joblib
+      hash: md5
+      md5: e3f27ab6ed3793ee8663a62970d46fe5
+      size: 6424
+    - path: models/regression/linear.joblib
+      hash: md5
+      md5: 57e7b6a8da55b1cf2b700d4998a90e93
+      size: 2561
+  clf_sklearn:
+    cmd: python src/models/train_classification.py --in_dir data/processed 
+      --model_dir models/classification --report_path reports/metrics.json 
+      --table_csv reports/classification_metrics.csv
+    deps:
+    - path: data/processed/X_test.parquet
+      hash: md5
+      md5: 795c530181262d386027c61dde9b7579
+      size: 149338
+    - path: data/processed/X_train.parquet
+      hash: md5
+      md5: dc2e85c47289c7f6542f59c2d5ad7c25
+      size: 325544
+    - path: data/processed/yclf_test.parquet
+      hash: md5
+      md5: cae6d8c3d56662e1f47b3a6da863bc0f
+      size: 14035
+    - path: data/processed/yclf_train.parquet
+      hash: md5
+      md5: cb5ade7979e2af161c34bb823fae8ed7
+      size: 51683
+    - path: src/models/train_classification.py
+      hash: md5
+      md5: a40537715a176ca9a6eb5aa459bd6524
+      size: 3940
+    outs:
+    - path: figures
+      hash: md5
+      md5: 04187914d3a77256a839fd9ef8a06165.dir
+      size: 200627
+      nfiles: 4
+    - path: models/classification/gbt.joblib
+      hash: md5
+      md5: 208a2e4eedb5deec8cceb61f3d37c044
+      size: 139896
+    - path: models/classification/logreg.joblib
+      hash: md5
+      md5: e52a2e32382d07069ab0f6eb42821ae7
+      size: 1871
+    - path: models/classification/rf.joblib
+      hash: md5
+      md5: 8a73dd668f1a5b057a486460bfea7662
+      size: 69016473
+    - path: models/classification/svm_linear.joblib
+      hash: md5
+      md5: 6cbb6a0e1a1cbae97276e1ca4501befb
+      size: 1739
+    - path: reports/classification_metrics.csv
+      hash: md5
+      md5: e29819d53663e656e95994f13eab2ac0
+      size: 275
+  reg_spark:
+    cmd: "powershell -Command \"$env:PYSPARK_PYTHON='$PWD/.venv/Scripts/python.exe';
+      $env:PYSPARK_DRIVER_PYTHON='$PWD/.venv/Scripts/python.exe'; python src/models/train_spark_regression.py
+      --csv data/raw/zomato_df_final_data.csv --report_path reports/metrics.json\"\
+      \n"
+    deps:
+    - path: data/raw/zomato_df_final_data.csv
+      hash: md5
+      md5: 6bb696eac5889d15f134cee5ff09eb5d
+      size: 2690897
+    - path: src/models/train_spark_regression.py
+      hash: md5
+      md5: 442b1aa0aea88c0cb18eec3ed80567e4
+      size: 3698
+  clf_spark:
+    cmd: "powershell -Command \"$env:PYSPARK_PYTHON='$PWD/.venv/Scripts/python.exe';
+      $env:PYSPARK_DRIVER_PYTHON='$PWD/.venv/Scripts/python.exe'; python src/models/train_spark_classification.py
+      --csv data/raw/zomato_df_final_data.csv --report_path reports/metrics.json\"\
+      \n"
+    deps:
+    - path: data/raw/zomato_df_final_data.csv
+      hash: md5
+      md5: 6bb696eac5889d15f134cee5ff09eb5d
+      size: 2690897
+    - path: src/models/train_spark_classification.py
+      hash: md5
+      md5: 56b44f041ff70464132fa028dae04e81
+      size: 3549
+    outs:
+    - path: reports/metrics.json
+      hash: md5
+      md5: d672df3becadcf092331062e62fdbcef
+      size: 126
