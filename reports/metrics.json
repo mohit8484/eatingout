@@ -1,0 +1,6 @@
+{
+  "regression": {
+    "linear_regression_mse": 0.09184449322478618,
+    "gradient_descent_mse": 0.09182509662611202
+  }
+}
