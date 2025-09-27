@@ -1,0 +1,70 @@
+stages:
+  preprocess:
+    cmd: python src/pipeline/preprocess.py --in data/raw/zomato_df_final_data.csv --out data/interim/preprocessed.parquet
+    deps:
+      - src/pipeline/preprocess.py
+      - data/raw/zomato_df_final_data.csv
+    outs:
+      - data/interim/preprocessed.parquet
+
+  features:
+    cmd: python src/features/build_features.py --in data/interim/preprocessed.parquet --outdir data/processed --top_cuisines 20 --top_categories 50 --seed 42
+    deps:
+      - src/features/build_features.py
+      - data/interim/preprocessed.parquet
+    outs:
+      - data/processed/X_train.parquet
+      - data/processed/X_test.parquet
+      - data/processed/yreg_train.parquet
+      - data/processed/yreg_test.parquet
+      - data/processed/yclf_train.parquet
+      - data/processed/yclf_test.parquet
+      - data/processed/features_list.csv
+
+  reg_sklearn:
+    cmd: python src/models/train_regression.py --in_dir data/processed --model_dir models/regression --report_path reports/metrics.json
+    deps:
+      - src/models/train_regression.py
+      - data/processed/X_train.parquet
+      - data/processed/X_test.parquet
+      - data/processed/yreg_train.parquet
+      - data/processed/yreg_test.parquet
+    outs:
+      - models/regression/linear.joblib
+      - models/regression/gd_model.joblib
+
+  clf_sklearn:
+    cmd: python src/models/train_classification.py --in_dir data/processed --model_dir models/classification --report_path reports/metrics.json --table_csv reports/classification_metrics.csv
+    deps:
+      - src/models/train_classification.py
+      - data/processed/X_train.parquet
+      - data/processed/X_test.parquet
+      - data/processed/yclf_train.parquet
+      - data/processed/yclf_test.parquet
+    outs:
+      - models/classification/logreg.joblib
+      - models/classification/rf.joblib
+      - models/classification/gbt.joblib
+      - models/classification/svm_linear.joblib
+      - reports/classification_metrics.csv
+      - figures
+
+  reg_spark:
+    cmd: >
+      powershell -Command "$env:PYSPARK_PYTHON='$PWD/.venv/Scripts/python.exe';
+      $env:PYSPARK_DRIVER_PYTHON='$PWD/.venv/Scripts/python.exe';
+      python src/models/train_spark_regression.py --csv data/raw/zomato_df_final_data.csv --report_path reports/metrics.json"
+    deps:
+      - src/models/train_spark_regression.py
+      - data/raw/zomato_df_final_data.csv
+
+  clf_spark:
+    cmd: >
+      powershell -Command "$env:PYSPARK_PYTHON='$PWD/.venv/Scripts/python.exe';
+      $env:PYSPARK_DRIVER_PYTHON='$PWD/.venv/Scripts/python.exe';
+      python src/models/train_spark_classification.py --csv data/raw/zomato_df_final_data.csv --report_path reports/metrics.json"
+    deps:
+      - src/models/train_spark_classification.py
+      - data/raw/zomato_df_final_data.csv
+    metrics:
+      - reports/metrics.json
