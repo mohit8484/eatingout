@@ -1,0 +1,63 @@
+=== EDA SUMMARY ===
+{
+  "rows": 10500,
+  "cols": 17,
+  "columns": [
+    "address",
+    "cost",
+    "cuisine",
+    "lat",
+    "link",
+    "lng",
+    "phone",
+    "rating_number",
+    "rating_text",
+    "subzone",
+    "title",
+    "type",
+    "votes",
+    "groupon",
+    "color",
+    "cost_2",
+    "cuisine_color"
+  ],
+  "approx_unique_cuisines_count": 426,
+  "top_3_suburbs": {
+    "CBD": 476,
+    "Surry Hills": 260,
+    "Parramatta": 225
+  },
+  "corr_cost_votes": 0.27021555258278407,
+  "price_comparison_stats": {
+    "Poor": {
+      "n": 201,
+      "mean": 55.84577114427861,
+      "median": 50.0,
+      "std": 23.738809880180664
+    },
+    "Excellent": {
+      "n": 51,
+      "mean": 101.66666666666667,
+      "median": 60.0,
+      "std": 113.21513444176387
+    }
+  }
+}
+
+Missingness (top 15):
+       column  missing_%
+rating_number      31.58
+        votes      31.58
+       cost_2       3.30
+         cost       3.30
+          lng       1.83
+          lat       1.83
+      address       0.00
+         link       0.00
+      cuisine       0.00
+  rating_text       0.00
+        phone       0.00
+        title       0.00
+      subzone       0.00
+         type       0.00
+      groupon       0.00
