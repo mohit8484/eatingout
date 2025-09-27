@@ -1,6 +1,5 @@
 [core]
     remote = gdrive
 ['remote "gdrive"']
-    url = gdrive://<1CQAZcZ31icESBsScOScHudvRJo5OpRxW?hl=en>
-    gdrive_acknowledge_abuse = true
-    gdrive_service_account_json_file_path = C:\Users\DELL\Documents\keys\eatingout-dvc-4a386fc10c7e.json
+    url = gdrive://1CQAZcZ31icESBsScOScHudvRJo5OpRxW
+    gdrive_use_service_account = true
