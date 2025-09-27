@@ -3,3 +3,4 @@
 ['remote "gdrive"']
     url = gdrive://<1CQAZcZ31icESBsScOScHudvRJo5OpRxW?hl=en>
     gdrive_acknowledge_abuse = true
+    gdrive_service_account_json_file_path = C:\Users\DELL\Documents\keys\eatingout-dvc.json

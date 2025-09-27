@@ -4,3 +4,6 @@ __pycache__/
 .DS_Store
 *.tmp
 /figures
+
+# DVC/Google service account key
+*.json
